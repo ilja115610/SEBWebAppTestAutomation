@@ -63,7 +63,10 @@ public class MaxAmountFunctionalCalculationsTest {
         return new ChromeDriver();
     }
 
-
+    /**
+     * This method tests calculation with range of income values 1200 - 3000
+     * and other variables fixed
+     */
     @Test
     public void incomeRangeTest () {
 
@@ -86,6 +89,11 @@ public class MaxAmountFunctionalCalculationsTest {
     }
 
 
+    /**
+     * This method tests calculation with range of liabilities values 10 - 300
+     * and other variables fixed
+     */
+
     @Test
     public void liabilitiesRangeTest () {
 
@@ -106,6 +114,10 @@ public class MaxAmountFunctionalCalculationsTest {
         }
     }
 
+    /**
+     * This method tests calculation with range of dependents values 0 - 4
+     * and other variables fixed
+     */
     @Test
     public void dependentsRangeTest () {
 
@@ -128,6 +140,9 @@ public class MaxAmountFunctionalCalculationsTest {
     }
 
 
+    /**
+     * This method test calculations when number of dependents exceed financial capabilities for car lease.
+     */
     @Test
     public void dependentsRangeExceedTest () {
 
@@ -145,6 +160,9 @@ public class MaxAmountFunctionalCalculationsTest {
     }
 
 
+    /**
+     * This method tests calculations when liabilities amount exceeds financial capabilities for lease.
+     */
     @Test
     public void liabilitiesRangeExceedTest () {
 
