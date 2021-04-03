@@ -1,5 +1,6 @@
 package maxLeasingCalculator;
 
+import static formFields.FormFields.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
@@ -8,9 +9,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import webpages.MaxLeasePage;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MaxAmountFunctionalCalculationsTest {
@@ -19,7 +19,7 @@ public class MaxAmountFunctionalCalculationsTest {
     private static final String path = "src/main/resources/chromedriver/chromedriver.exe";
     private static final String chromeDriver = "webdriver.chrome.driver";
     private MaxLeasingCalculator calculator;
-    private Map<String, WebElement> elementMap = new HashMap<>();
+    private MaxLeasePage maxLeasePage;
     private int income;
     private int liabilities;
     private int dependents;
@@ -29,13 +29,8 @@ public class MaxAmountFunctionalCalculationsTest {
     private void setup() {
         driver = getDriver();
         calculator = new MaxAmount();
+        maxLeasePage = new MaxLeasePage(driver);
         openAndMaximize();
-        WebElement income = driver.findElement(By.xpath("//*[@id=\"netoIncome\"]"));
-        WebElement dependents = driver.findElement(By.xpath("//*[@id=\"numOfDependants\"]"));
-        WebElement liabilities = driver.findElement(By.xpath("//*[@id=\"monthlyFinancialObligations\"]"));
-        elementMap.put("Income",income);
-        elementMap.put("Dependents",dependents);
-        elementMap.put("Liabilities",liabilities);
 
     }
 
@@ -46,16 +41,12 @@ public class MaxAmountFunctionalCalculationsTest {
 
     @AfterEach
     public void clearAfter () {
-        for(Map.Entry<String,WebElement> entry : elementMap.entrySet()){
-            entry.getValue().clear();
-        }
+       this.maxLeasePage.getMaxLeaseFields().forEach(WebElement::clear);
     }
 
     @BeforeEach
     public void clearBefore () {
-        for(Map.Entry<String,WebElement> entry : elementMap.entrySet()){
-            entry.getValue().clear();
-        }
+        this.maxLeasePage.getMaxLeaseFields().forEach(WebElement::clear);
     }
 
     public WebDriver getDriver() {
@@ -70,24 +61,18 @@ public class MaxAmountFunctionalCalculationsTest {
     @Test
     public void incomeRangeTest () {
 
-        dependents = 0; liabilities = 0;
-         elementMap.get("Dependents").sendKeys(String.valueOf(dependents));
-         elementMap.get("Liabilities").sendKeys(String.valueOf(liabilities));
+        dependents = 0; liabilities = 0; income = 0;
+        maxLeasePage.setInitialFormValues(income,dependents,liabilities);
 
-
-        int actualResult;
-        int expectedResult;
+        int expectedResult, actualResult;
         for(int i = 1200; i<= 3000; i+=200){
-            elementMap.get("Income").sendKeys(String.valueOf(i));
-            WebElement result = driver.findElement(By.xpath("//*[@id=\"leaseSum\"]"));
-            ((JavascriptExecutor)driver).executeScript("arguments[0].removeAttribute('style')", result);
-            actualResult = Integer.parseInt(result.getText().replaceAll(" ",""));
+            maxLeasePage.clearFormFields(maxLeasePage.getFieldByName(INCOME));
+            maxLeasePage.setIncomeValue(String.valueOf(i));
+            actualResult = Integer.parseInt(maxLeasePage.getActualResult());
             expectedResult = calculator.getMaxAmount(i,dependents,liabilities);
             assertThat(actualResult).isEqualTo(expectedResult);
-            elementMap.get("Income").clear();
         }
     }
-
 
     /**
      * This method tests calculation with range of liabilities values 10 - 300
@@ -97,20 +82,16 @@ public class MaxAmountFunctionalCalculationsTest {
     @Test
     public void liabilitiesRangeTest () {
 
-        income = 1200; dependents = 0;
-        elementMap.get("Dependents").sendKeys(String.valueOf(dependents));
-        elementMap.get("Income").sendKeys(String.valueOf(income));
+        dependents = 0; liabilities = 0; income = 1200;
+        maxLeasePage.setInitialFormValues(income,dependents,liabilities);
 
-        int actualResult;
-        int expectedResult;
+        int expectedResult, actualResult;
         for (int i = 10; i <= 300; i += 20) {
-            elementMap.get("Liabilities").sendKeys(String.valueOf(i));
-            WebElement result = driver.findElement(By.xpath("//*[@id=\"leaseSum\"]"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('style')", result);
-            actualResult = Integer.parseInt(result.getText().replaceAll(" ", ""));
-            expectedResult = calculator.getMaxAmount(income, dependents, i);
+            maxLeasePage.clearFormFields(maxLeasePage.getFieldByName(LIABILITIES));
+            maxLeasePage.setLiabilitiesValue(String.valueOf(i));
+            actualResult = Integer.parseInt(maxLeasePage.getActualResult());
+            expectedResult = calculator.getMaxAmount(income,dependents,i);
             assertThat(actualResult).isEqualTo(expectedResult);
-            elementMap.get("Liabilities").clear();
         }
     }
 
@@ -121,20 +102,16 @@ public class MaxAmountFunctionalCalculationsTest {
     @Test
     public void dependentsRangeTest () {
 
-        income = 1200; liabilities = 0;
-        elementMap.get("Income").sendKeys(String.valueOf(income));
-        elementMap.get("Liabilities").sendKeys(String.valueOf(liabilities));
+        dependents = 0; liabilities = 0; income = 1200;
+        maxLeasePage.setInitialFormValues(income,dependents,liabilities);
 
-        int actualResult;
-        int expectedResult;
+        int expectedResult, actualResult;
         for (int i = 0; i <= 4; i ++) {
-            elementMap.get("Dependents").sendKeys(String.valueOf(i));
-            WebElement result = driver.findElement(By.xpath("//*[@id=\"leaseSum\"]"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('style')", result);
-            actualResult = Integer.parseInt(result.getText().replaceAll(" ", ""));
-            expectedResult = calculator.getMaxAmount(income, i, liabilities);
+            maxLeasePage.clearFormFields(maxLeasePage.getFieldByName(DEPENDENTS));
+            maxLeasePage.setDependentsValue(String.valueOf(i));
+            actualResult = Integer.parseInt(maxLeasePage.getActualResult());
+            expectedResult = calculator.getMaxAmount(income,i,liabilities);
             assertThat(actualResult).isEqualTo(expectedResult);
-            elementMap.get("Dependents").clear();
         }
 
     }
@@ -146,54 +123,45 @@ public class MaxAmountFunctionalCalculationsTest {
     @Test
     public void dependentsRangeExceedTest () {
 
-        income = 1200; liabilities = 0;
-        elementMap.get("Income").sendKeys(String.valueOf(income));
-        elementMap.get("Liabilities").sendKeys(String.valueOf(liabilities));
+        dependents = 0; liabilities = 0; income = 1200;
+        maxLeasePage.setInitialFormValues(income,dependents,liabilities);
 
         for (int i = 5; i <= 8; i ++) {
-            elementMap.get("Dependents").sendKeys(String.valueOf(i));
-            WebElement result = driver.findElement(By.xpath("//*[@id=\"resultWrapperTextThree\"]/div/p"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('style')", result);
-            assertThat(result.getText()).isEqualTo("We cannot provide financing with the entered data. Add a surety, if possible.");
-            elementMap.get("Dependents").clear();
+            maxLeasePage.clearFormFields(maxLeasePage.getFieldByName(DEPENDENTS));
+            maxLeasePage.setDependentsValue(String.valueOf(i));
+            assertThat(maxLeasePage.getResultMsgUpper()).isEqualTo("We cannot provide financing with the entered data. Add a surety, if possible.");
         }
     }
-
 
     /**
      * This method tests calculations when liabilities amount exceeds financial capabilities for lease.
      */
     @Test
-    public void liabilitiesRangeExceedTest () {
+    public void liabilitiesRangeExceedTest () throws InterruptedException {
 
-        income = 1200; dependents = 0;
-        elementMap.get("Income").sendKeys(String.valueOf(income));
-        elementMap.get("Dependents").sendKeys(String.valueOf(dependents));
+        dependents = 0; liabilities = 0; income = 1200;
+        maxLeasePage.setInitialFormValues(income,dependents,liabilities);
 
-        int expectedResult;
+        int expectedResult, actualResult;
         for (int i = 200; i <= 350; i +=20) {
-            elementMap.get("Liabilities").sendKeys(String.valueOf(i));
-            WebElement resultNum = driver.findElement(By.xpath("//*[@id=\"leaseSum\"]"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('style')", resultNum);
+            maxLeasePage.clearFormFields(maxLeasePage.getFieldByName(LIABILITIES));
+            maxLeasePage.setLiabilitiesValue(String.valueOf(i));
             if(i<302){
+                actualResult = Integer.parseInt(maxLeasePage.getActualResult());
                 expectedResult = calculator.getMaxAmount(income, dependents, i);
-                assertThat(Integer.parseInt(resultNum.getText().replaceAll(" ", ""))).isEqualTo(expectedResult);
-                elementMap.get("Liabilities").clear();
+                assertThat(actualResult).isEqualTo(expectedResult);
                 continue;
             }
-            WebElement resultMsg = driver.findElement(By.xpath("//*[@id=\"resultWrapperTextFive\"]"));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].removeAttribute('style')", resultMsg);
-            assertThat(resultMsg.getText()).isEqualTo("With the entered data, the maximum lease amount is below 5,000 euros. If possible, add a surety or review SEB car loan.");
-            elementMap.get("Liabilities").clear();
+            assertThat(maxLeasePage.getResultMsgLower()).isEqualTo("With the entered data, the maximum lease amount is below 5,000 euros. If possible, add a surety or review SEB car loan.");
+            maxLeasePage.clearFormFields(maxLeasePage.getFieldByName(LIABILITIES));
         }
     }
-
 
 
     public void openAndMaximize() {
         driver.get("https://www.seb.ee/eng/loan-and-leasing/leasing/car-leasing#calculators");
         driver.manage().window().maximize();
-        driver.findElement(By.xpath("/html/body/div[5]/div/div[4]/ul/li[1]/a")).click();
+        maxLeasePage.expandMaxLeaseCalculatorSection();
 
 
     }
