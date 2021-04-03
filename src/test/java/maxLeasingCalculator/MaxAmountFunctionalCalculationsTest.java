@@ -1,14 +1,13 @@
 package maxLeasingCalculator;
 
-import static formFields.FormFields.*;
+import static common.FormFields.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import util.PropertyReader;
 import webpages.MaxLeasePage;
 
 
@@ -16,8 +15,7 @@ import webpages.MaxLeasePage;
 public class MaxAmountFunctionalCalculationsTest {
 
     private WebDriver driver;
-    private static final String path = "src/main/resources/chromedriver/chromedriver.exe";
-    private static final String chromeDriver = "webdriver.chrome.driver";
+    private PropertyReader propertyReader;
     private MaxLeasingCalculator calculator;
     private MaxLeasePage maxLeasePage;
     private int income;
@@ -27,6 +25,7 @@ public class MaxAmountFunctionalCalculationsTest {
 
     @BeforeAll
     private void setup() {
+        this.propertyReader = new PropertyReader();
         driver = getDriver();
         calculator = new MaxAmount();
         maxLeasePage = new MaxLeasePage(driver);
@@ -50,7 +49,7 @@ public class MaxAmountFunctionalCalculationsTest {
     }
 
     public WebDriver getDriver() {
-        System.setProperty(chromeDriver, path);
+        System.setProperty(propertyReader.getProperty("chromeDriver"),propertyReader.getProperty("path"));
         return new ChromeDriver();
     }
 

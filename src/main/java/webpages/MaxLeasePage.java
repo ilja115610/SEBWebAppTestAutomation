@@ -1,6 +1,6 @@
 package webpages;
 
-import formFields.FormFields;
+import common.FormFields;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;

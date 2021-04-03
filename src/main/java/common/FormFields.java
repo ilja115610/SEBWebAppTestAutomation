@@ -1,4 +1,4 @@
-package formFields;
+package common;
 
 public enum FormFields {
 

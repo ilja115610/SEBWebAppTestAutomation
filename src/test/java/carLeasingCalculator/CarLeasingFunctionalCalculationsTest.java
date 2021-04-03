@@ -5,19 +5,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import util.PropertyReader;
 import webpages.CarLeasingPage;
 
 import java.util.List;
 
-import static formFields.FormFields.*;
+import static common.FormFields.*;
 import static org.assertj.core.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CarLeasingFunctionalCalculationsTest {
 
     private WebDriver driver;
-    private static final String path = "src/main/resources/chromedriver/chromedriver.exe";
-    private static final String chromeDriver = "webdriver.chrome.driver";
+    private PropertyReader propertyReader;
     private CarLeasingPage carLeasingPage;
     private CarLeasingCalculator carLeasingCalculator;
     private double priceOfVehicle;
@@ -29,6 +29,7 @@ public class CarLeasingFunctionalCalculationsTest {
 
     @BeforeAll
     private void setup() {
+        this.propertyReader = new PropertyReader();
         driver = getDriver();
         this.carLeasingPage = new CarLeasingPage(driver);
         this.carLeasingCalculator = new MonthlyPayment();
@@ -60,7 +61,7 @@ public class CarLeasingFunctionalCalculationsTest {
 
 
     public WebDriver getDriver() {
-        System.setProperty(chromeDriver, path);
+        System.setProperty(propertyReader.getProperty("chromeDriver"),propertyReader.getProperty("path"));
         return new ChromeDriver();
     }
 
