@@ -1,4 +1,4 @@
-# Web application functional testing with Selenium Java
+# Web application automated testing with Selenium Java
 
 ##### Used Technologies & Tools:
 
